@@ -1,0 +1,6 @@
+framework module Pods_DZ12_TableView {
+  umbrella header "Pods-DZ12-TableView-umbrella.h"
+
+  export *
+  module * { export * }
+}
