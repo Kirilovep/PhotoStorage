@@ -43,7 +43,7 @@ class ViewController: UIViewController {
             mainCollectionView.dataSource = self
             let nib = UINib(nibName: "MainCollectionViewCell", bundle: nil)
             mainCollectionView.register(nib, forCellWithReuseIdentifier: "mainCollCell")
-            
+            //123
             
         }
     }
