@@ -8,6 +8,8 @@
 import UIKit
 
 class ViewController: UIViewController {
+  
+    
     
     //MARK:- Properties -
     
@@ -57,6 +59,7 @@ class ViewController: UIViewController {
         getDocuments(nameOfFolder: nil, folderUrls: directoryURL!)
         changeUiButtonOutlet.image = UIImage(systemName: "table")
         createNotifictaion()
+       
     }
     //MARK:- Functions -
     
@@ -276,6 +279,7 @@ extension ViewController: UIImagePickerControllerDelegate, UINavigationControlle
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true, completion: nil)
         if let originalImage = info[.originalImage] as? UIImage,
            let url = info[.imageURL] as? URL {
             if let newUrl = directoryURL {
@@ -286,15 +290,17 @@ extension ViewController: UIImagePickerControllerDelegate, UINavigationControlle
                     let newImageUrl = (directoryUrl.appendingPathComponent(url.lastPathComponent))
                     
                     let pngImageData = originalImage.pngData()
-                    
-                    try pngImageData?.write(to: newImageUrl)
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        try? pngImageData?.write(to: newImageUrl)
+                    }
+                   
                 } catch {
                     print("Something went wrong")
                 }
             }
         }
         getDocuments(nameOfFolder: nil, folderUrls: directoryURL!)
-        picker.dismiss(animated: true, completion: nil)
+       
     }
 }
 
@@ -320,7 +326,14 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
                     
                     do {
                         let imageUrl = newUrl.appendingPathComponent(imageName)
-                        imageCell.cellImageView.image = UIImage(contentsOfFile: imageUrl.path)
+                        DispatchQueue.global(qos: .userInitiated).async {
+                            let image = UIImage(contentsOfFile: imageUrl.path)
+                            DispatchQueue.main.async {
+                                imageCell.cellImageView.image = image
+                            }
+                        }
+                      
+                       
                     }
                     return imageCell
                 }
@@ -340,14 +353,12 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         if editButtonOutlet.title == "Edit" {
             switch currentData.type {
             case .image:
-                if let imageName = currentData.name {
+                if currentData.name != nil {
                     let imageController = ImageViewController(nibName: ImageViewController.identifier, bundle: nil)
                     
-                    if let newUrl = directoryURL {
+                    if directoryURL != nil {
                         
                         do {
-                            //let imageUrl = newUrl.appendingPathComponent(imageName)
-                            //imageController.fullImage = UIImage(contentsOfFile: imageUrl.path)
                             imageController.folderDirectoryURL = directoryURL
                             self.navigationController?.pushViewController(imageController, animated: true)
                         }
@@ -383,20 +394,15 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
         }
     }
     
-    //    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-    //        if editingStyle == .delete {
-    //            deleteDocuments(nameOfFolder: folderData[indexPath.row].name ?? " ", folderUrl: directoryURL!)
-    //            folderData.remove(at: indexPath.row)
-    //
-    //            tableView.reloadData()
-    //        }
-    //    }
-    
 }
 
 
 //MARK:- CollectionView extension
 extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+   
+    
+   
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return folderData.count
     }
@@ -417,7 +423,14 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
                     do {
                         let imageUrl = newUrl.appendingPathComponent(imageName)
                         
-                        imageCell.cellImageView.image = UIImage(contentsOfFile: imageUrl.path)
+                        DispatchQueue.global(qos: .userInitiated).async {
+                            let image = UIImage(contentsOfFile: imageUrl.path)
+                            DispatchQueue.main.async {
+                                imageCell.cellImageView.image = image
+                            }
+                        }
+                        
+                        
                     }
                     return imageCell
                 }
@@ -436,20 +449,17 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let currentData = folderData[indexPath.row]
         
-        
         if editButtonOutlet.title == "Edit" {
             switch currentData.type {
             case .image:
-                if let imageName = currentData.name {
+                if currentData.name != nil {
                     let imageController = ImageViewController(nibName: ImageViewController.identifier, bundle: nil)
                     
-                    if let newUrl = directoryURL {
+                    if directoryURL != nil {
                         
                         
                         
                         do {
-                            //let imageUrl = newUrl.appendingPathComponent(imageName)
-                            //imageController.fullImage = UIImage(contentsOfFile: imageUrl.path)
                             imageController.folderDirectoryURL = directoryURL
                             self.navigationController?.pushViewController(imageController, animated: true)
                         }

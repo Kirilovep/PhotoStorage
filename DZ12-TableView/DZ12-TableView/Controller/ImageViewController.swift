@@ -59,10 +59,10 @@ class ImageViewController: UIViewController {
             imageNames = []
             imageNames = try fileManager.contentsOfDirectory(at: directoryURL, includingPropertiesForKeys: nil).map {$0.lastPathComponent}
             
-            for i in 0..<imageNames.count {
-                if imageNames[i].contains(".jpeg") {
+            for name in 0..<imageNames.count {
+                if imageNames[name].contains(".jpeg") {
                     if let newUrl = folderDirectoryURL {
-                        let imageUrl = newUrl.appendingPathComponent(imageNames[i])
+                        let imageUrl = newUrl.appendingPathComponent(imageNames[name])
                         imagesData.append(UIImage(contentsOfFile: imageUrl.path)!)
                     }
                 }
